@@ -1,6 +1,6 @@
 # scala-docker-postgres-01
 Scala docker postgres integration
-```
+```scala
 package griffio
 
 import anorm._
