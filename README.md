@@ -1,13 +1,30 @@
 # scala-docker-postgres-01
 Scala docker postgres integration
-
-**Log Output
 ```
-[info] postgres service
-[info] - must be ready
-[info] Run completed in 3 seconds, 41 milliseconds.
-[info] Total number of tests run: 1
-[info] Suites: completed 1, aborted 0
-[info] Tests: succeeded 1, failed 0, canceled 0, ignored 0, pending 0
-[info] All tests passed.
+package griffio
+
+import anorm._
+import com.whisk.docker.scalatest.DockerTestKit
+import org.scalatest.{FlatSpec, MustMatchers}
+import play.api.db.Databases
+
+class PostgresDockerSpec extends FlatSpec with MustMatchers with DockerTestKit with PostgresDockerKit {
+
+  "postgres service" must "be ready" in {
+    isContainerReady(postgresContainer).futureValue mustBe true
+  }
+
+  val config: Map[String, _] = Map("username" -> PostgresUser, "password" -> PostgresPassword)
+
+  "connection" must "select" in Databases.withDatabase(
+    "org.postgresql.Driver",
+    s"jdbc:postgresql://localhost:$PostgresExposedPort/$PostgresDatabasename",
+    PostgresDatabasename,
+    config
+  ) { database =>
+    database.withConnection { implicit c =>
+      SQL("Select 1").execute()
+    }
+  }
+}
 ```
