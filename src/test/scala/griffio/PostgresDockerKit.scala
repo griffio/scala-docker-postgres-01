@@ -15,13 +15,14 @@ import com.whisk.docker.{ DockerCommandExecutor, DockerContainer, DockerContaine
 trait PostgresDockerKit extends DockerKit {
   import scala.concurrent.duration._
   def PostgresAdvertisedPort = 5432
-  def PostgresExposedPort = 44444
+  def PostgresExposedPort = 54320
   def PostgresUser = "postgres"
   def PostgresPassword = "password"
+  def PostgresDatabasename = "postgresdb"
 
-  val postgresContainer: DockerContainer = DockerContainer("postgres:9.5.3")
+  val postgresContainer: DockerContainer = DockerContainer("postgres:9.6.9")
     .withPorts((PostgresAdvertisedPort, Some(PostgresExposedPort)))
-    .withEnv(s"POSTGRES_USER=$PostgresUser", s"POSTGRES_PASSWORD=$PostgresPassword")
+    .withEnv(s"POSTGRES_USER=$PostgresUser", s"POSTGRES_PASSWORD=$PostgresPassword", s"POSTGRES_DB=$PostgresDatabasename")
     .withReadyChecker(
       new PostgresReadyChecker(Some(PostgresExposedPort))
         .looped(15, 1.second)
